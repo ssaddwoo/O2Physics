@@ -241,7 +241,7 @@ struct f0980pbpbanalysis {
   template <typename TrackType>
   bool PIDSelected(const TrackType track)
   {
-    if(SelectType == 0) {
+    if (SelectType == 0) {
       if (cfgUSETOF) {
         if (std::fabs(track.tofNSigmaPi()) > cMaxTOFnSigmaPion) {
           return 0;
@@ -249,12 +249,12 @@ struct f0980pbpbanalysis {
         if (std::fabs(track.tpcNSigmaPi()) > cMaxTPCnSigmaPion) {
           return 0;
         }
-      } 
+      }
       if (std::fabs(track.tpcNSigmaPi()) > cMaxTPCnSigmaPionS) {
-      return 0;
+        return 0;
       }
     }
-    if(SelectType == 1) {
+    if (SelectType == 1) {
       if (cfgUSETOF) {
         if (track.hasTOF()) {
           if (std::fabs(track.tofNSigmaPi()) > cMaxTOFnSigmaPion) {
@@ -263,16 +263,14 @@ struct f0980pbpbanalysis {
           if (std::fabs(track.tpcNSigmaPi()) > cMaxTPCnSigmaPion) {
             return 0;
           }
-        }
-        else { 
+        } else {
           if (std::fabs(track.tpcNSigmaPi()) > cMaxTPCnSigmaPionS) {
             return 0;
           }
         }
-      } 
-      else {
+      } else {
         if (std::fabs(track.tpcNSigmaPi()) > cMaxTPCnSigmaPionS) {
-        return 0;
+          return 0;
         }
       }
     }
@@ -298,44 +296,34 @@ struct f0980pbpbanalysis {
     histos.fill(HIST("QA/EPResBC"), centrality, TMath::Cos(static_cast<float>(nmode) * (eventPlaneRefA - eventPlaneRefB)));
 
     TLorentzVector Pion1, Pion2, Reco;
-    for (auto& trk1: dTracks) {
+    for (auto& trk1 : dTracks) {
       if (!trackSelected(trk1))
         continue;
       histos.fill(HIST("QA/Nsigma_TPC"), trk1.pt(), trk1.tpcNSigmaPi());
       histos.fill(HIST("QA/Nsigma_TOF"), trk1.pt(), trk1.tofNSigmaPi());
       histos.fill(HIST("QA/TPC_TOF"), trk1.tpcNSigmaPi(), trk1.tofNSigmaPi());
-      // continue;
-      
-      // int nTotal = 0;
-      // int nTrackSelected = 0;
-      // int nPIDSelected = 0;
-      // int nSelected = 0;
 
-      for (auto& trk2: dTracks) {
-        // nTotal++;
-        if (!trackSelected(trk1) || !trackSelected(trk2)){
+      for (auto& trk2 : dTracks) {
+        if (!trackSelected(trk1) || !trackSelected(trk2)) {
           continue;
         }
-        // nTrackSelected++;
 
-        //PID        
-        if (!PIDSelected(trk1) || !PIDSelected(trk2)){
+        // PID
+        if (!PIDSelected(trk1) || !PIDSelected(trk2)) {
           continue;
         }
-        // nPIDSelected++;
 
         if (trk1.index() == trk2.index()) {
           histos.fill(HIST("QA/Nsigma_TPC_selected"), trk1.pt(), trk1.tpcNSigmaPi());
           histos.fill(HIST("QA/Nsigma_TOF_selected"), trk1.pt(), trk1.tofNSigmaPi());
           histos.fill(HIST("QA/TPC_TOF_selected"), trk1.tpcNSigmaPi(), trk1.tofNSigmaPi());
         }
-        // nSelected++;
 
         Pion1.SetXYZM(trk1.px(), trk1.py(), trk1.pz(), massPi);
         Pion2.SetXYZM(trk2.px(), trk2.py(), trk2.pz(), massPi);
         Reco = Pion1 + Pion2;
 
-        if (Reco.Rapidity() > cfgMaxRap || Reco.Rapidity() < cfgMinRap){
+        if (Reco.Rapidity() > cfgMaxRap || Reco.Rapidity() < cfgMinRap) {
           continue;
         }
 
@@ -343,18 +331,11 @@ struct f0980pbpbanalysis {
 
         if (trk1.sign() * trk2.sign() < 0) {
           histos.fill(HIST("hInvMass_f0980_US_EPA"), Reco.M(), Reco.Pt(), centrality, relPhi);
-        }
-        else if (trk1.sign() > 0 && trk2.sign() > 0) {
+        } else if (trk1.sign() > 0 && trk2.sign() > 0) {
           histos.fill(HIST("hInvMass_f0980_LSpp_EPA"), Reco.M(), Reco.Pt(), centrality, relPhi);
-        }
-        else if (trk1.sign() < 0 && trk2.sign() < 0) {
+        } else if (trk1.sign() < 0 && trk2.sign() < 0) {
           histos.fill(HIST("hInvMass_f0980_LSmm_EPA"), Reco.M(), Reco.Pt(), centrality, relPhi);
         }
-        // std::cout << "trk1: " << trk1.index() << std::endl;
-        // std::cout << "trk2: " << trk2.index() << std::endl;
-        // std::cout << "Total: " << nTotal << std::endl;
-        // std::cout << "TrackSeledcted: " << nTrackSelected << std::endl;
-        // std::cout << "PIDSelected: " << nPIDSelected << std::endl;
       }
     }
   }
